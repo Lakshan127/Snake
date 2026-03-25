@@ -1,0 +1,138 @@
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const scoreText = document.getElementById("score");
+const restartBtn = document.getElementById("restart-btn");
+
+const box = 20;
+const speed = 100;
+
+let snake, direction, nextDirection, food, score, gameOver;
+let lastTime = 0;
+let moveTimer = 0;
+
+function init() {
+  snake = [{ x: 200, y: 200 }];
+  direction = "RIGHT";
+  nextDirection = "RIGHT";
+  food = randomFood();
+  score = 0;
+  gameOver = false;
+  moveTimer = 0;
+  scoreText.textContent = "Punkte: " + score;
+  lastTime = 0;
+  requestAnimationFrame(gameLoop);
+}
+
+function randomFood() {
+  return {
+    x: Math.floor(Math.random() * 20) * box,
+    y: Math.floor(Math.random() * 20) * box,
+  };
+}
+
+document.addEventListener("keydown", (e) => {
+  if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)) {
+    e.preventDefault();
+  }
+
+  if (e.key === "ArrowLeft" && direction !== "RIGHT") nextDirection = "LEFT";
+  if (e.key === "ArrowUp" && direction !== "DOWN") nextDirection = "UP";
+  if (e.key === "ArrowRight" && direction !== "LEFT") nextDirection = "RIGHT";
+  if (e.key === "ArrowDown" && direction !== "UP") nextDirection = "DOWN";
+
+  if (e.key === "Enter" && gameOver) init();
+});
+
+restartBtn.addEventListener("click", init);
+
+function draw() {
+  ctx.clearRect(0,0,400,400);
+
+  for (let i=0;i<snake.length;i++) {
+    const s = snake[i];
+
+    ctx.fillStyle = i === 0 ? "#00ff88" : "#33ffaa";
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = "#00ff88";
+
+    ctx.fillRect(s.x, s.y, box-1, box-1);
+  }
+
+  ctx.fillStyle = "red";
+  ctx.shadowBlur = 15;
+  ctx.shadowColor = "red";
+
+  ctx.beginPath();
+  ctx.arc(food.x + box/2, food.y + box/2, box/2.5, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function drawGameOver() {
+  ctx.fillStyle = "rgba(0,0,0,0.7)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.fillStyle = "#ff4444";
+  ctx.font = "bold 30px Poppins";
+  ctx.textAlign = "center";
+
+  ctx.fillText("💀 Game Over!",200,180);
+
+  ctx.font = "20px Poppins";
+  ctx.fillText("Drücke ENTER zum Neustart",200,210);
+  ctx.fillText("Punkte: "+score,200,240);
+}
+
+function update() {
+  direction = nextDirection;
+
+  let head = {...snake[0]};
+
+  if (direction === "LEFT") head.x -= box;
+  if (direction === "UP") head.y -= box;
+  if (direction === "RIGHT") head.x += box;
+  if (direction === "DOWN") head.y += box;
+
+  if (
+    head.x < 0 ||
+    head.x >= 400 ||
+    head.y < 0 ||
+    head.y >= 400 ||
+    snake.some(s => s.x === head.x && s.y === head.y)
+  ) {
+    gameOver = true;
+    draw();
+    drawGameOver();
+    return;
+  }
+
+  snake.unshift(head);
+
+  if (head.x === food.x && head.y === food.y) {
+    score++;
+    scoreText.textContent = "Punkte: " + score;
+    food = randomFood();
+  } else {
+    snake.pop();
+  }
+}
+
+function gameLoop(timestamp) {
+  if (gameOver) {
+    drawGameOver();
+    return;
+  }
+
+  const delta = timestamp - lastTime;
+  lastTime = timestamp;
+  moveTimer += delta;
+
+  if (moveTimer > speed) {
+    moveTimer = 0;
+    update();
+  }
+
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+init();
