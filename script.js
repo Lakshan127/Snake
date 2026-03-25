@@ -31,31 +31,32 @@ function randomFood() {
 }
 
 document.addEventListener("keydown", (e) => {
-  if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)) {
+
+  const key = e.key.toLowerCase();
+
+  if (
+    ["arrowup", "arrowdown", "arrowleft", "arrowright", "w", "a", "s", "d"].includes(key)
+  ) {
     e.preventDefault();
   }
 
-  if (e.key === "ArrowLeft" && direction !== "RIGHT") nextDirection = "LEFT";
-  if (e.key === "ArrowUp" && direction !== "DOWN") nextDirection = "UP";
-  if (e.key === "ArrowRight" && direction !== "LEFT") nextDirection = "RIGHT";
-  if (e.key === "ArrowDown" && direction !== "UP") nextDirection = "DOWN";
+  if ((key === "arrowleft" || key === "a") && direction !== "RIGHT")
+    nextDirection = "LEFT";
 
-  if (e.key === "Enter" && gameOver) init();
+  if ((key === "arrowup" || key === "w") && direction !== "DOWN")
+    nextDirection = "UP";
+
+  if ((key === "arrowright" || key === "d") && direction !== "LEFT")
+    nextDirection = "RIGHT";
+
+  if ((key === "arrowdown" || key === "s") && direction !== "UP")
+    nextDirection = "DOWN";
+
+  if (key === "enter" && gameOver) init();
 });
 
 
-document.addEventListener("keydown", (e) => {
-  if (["w","s","a","d"].includes(e.key)) {
-    e.preventDefault();
-  }
 
-  if (e.key === "a" && direction !== "RIGHT") nextDirection = "LEFT";
-  if (e.key === "w" && direction !== "DOWN") nextDirection = "UP";
-  if (e.key === "d" && direction !== "LEFT") nextDirection = "RIGHT";
-  if (e.key === "s" && direction !== "UP") nextDirection = "DOWN";
-
-  if (e.key === "Enter" && gameOver) init();
-});
 
 restartBtn.addEventListener("click", init);
 
