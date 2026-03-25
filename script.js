@@ -43,6 +43,20 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && gameOver) init();
 });
 
+
+document.addEventListener("keydown", (e) => {
+  if (["w","s","a","d"].includes(e.key)) {
+    e.preventDefault();
+  }
+
+  if (e.key === "a" && direction !== "RIGHT") nextDirection = "LEFT";
+  if (e.key === "w" && direction !== "DOWN") nextDirection = "UP";
+  if (e.key === "d" && direction !== "LEFT") nextDirection = "RIGHT";
+  if (e.key === "s" && direction !== "UP") nextDirection = "DOWN";
+
+  if (e.key === "Enter" && gameOver) init();
+});
+
 restartBtn.addEventListener("click", init);
 
 function draw() {
